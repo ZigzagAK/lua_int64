@@ -9,7 +9,8 @@
 
 #if !defined LUA_VERSION_NUM || LUA_VERSION_NUM < 502
 
-static void luaL_setfuncs (lua_State *l, const luaL_Reg *reg, int nup)
+static void
+luaL_setfuncs(lua_State *l, const luaL_Reg *reg, int nup)
 {
     int i;
 
@@ -24,7 +25,8 @@ static void luaL_setfuncs (lua_State *l, const luaL_Reg *reg, int nup)
     lua_pop(l, nup);
 }
 
-static void *luaL_testudata (lua_State *L, int i, const char *tname)
+static void *
+luaL_testudata(lua_State *L, int i, const char *tname)
 {
     void *p = lua_touserdata(L, i);
     luaL_checkstack(L, 2, "not enough stack slots");
@@ -185,6 +187,7 @@ ud64_lua_new(lua_State *L, const char *type)
     return top == 0 ? 1 : ud64_lua_init(L, ud);
 }
 
+
 static int
 ud64_lua_new_i64(lua_State *L)
 {
@@ -339,6 +342,7 @@ DECLARE_CMP(le, INT64, <=)
 DECLARE_CMP(lt, UINT64, <)
 DECLARE_CMP(le, UINT64, <=)
 
+
 static int
 op_eq(lua_State *L)
 {
@@ -362,6 +366,26 @@ static int
 op_len(lua_State *L)
 {
     lua_pushnumber(L, sizeof(ptrdiff_t));
+    return 1;
+}
+
+
+static int
+compare(lua_State *L)
+{
+    ud64_t lhs;
+    ud64_t rhs;
+
+    if (lua_gettop(L) != 2) {
+        return luaL_error(L, "two arguments required");
+    }
+
+    ud64_lua_value(L, 1, &lhs);
+    ud64_lua_value(L, 2, &rhs);
+
+    lua_pushnumber(L, UD64_GET(&lhs) > UD64_GET(&rhs) ? 1
+        : UD64_GET(&lhs) < UD64_GET(&rhs) ? -1 : 0);
+
     return 1;
 }
 
@@ -467,9 +491,12 @@ lib_int64[] = {
     { "__lt",  op_lt_INT64  },
     { "__le",  op_le_INT64  },
     { "__len", op_len       },
-    { "__tostring", tostring_INT64 },
-    { "__concat", concat_INT64 },
-    { NULL, NULL },
+    { "__tostring",
+             tostring_INT64 },
+    { "__concat",
+               concat_INT64 },
+    { "compare", compare    },
+    { NULL, NULL }
 };
 
 
@@ -486,9 +513,12 @@ lib_uint64[] = {
     { "__lt",  op_lt_UINT64  },
     { "__le",  op_le_UINT64  },
     { "__len", op_len        },
-    { "__tostring", tostring_UINT64 },
-    { "__concat", concat_UINT64 },
-    { NULL, NULL },
+    { "__tostring",
+             tostring_UINT64 },
+    { "__concat",
+               concat_UINT64 },
+    { "compare", compare     },
+    { NULL, NULL }
 };
 
 
@@ -496,7 +526,7 @@ static const luaL_Reg
 funcs[] = {
     { "signed",   ud64_lua_new_i64 },
     { "unsigned", ud64_lua_new_u64 },
-    { NULL,  NULL }
+    { NULL, NULL }
 };
 
 
@@ -507,14 +537,12 @@ int
 luaopen_int64(lua_State *L)
 {
     luaL_newmetatable(L, INT64);
-    lua_pushvalue(L, -1);
-    lua_setfield(L, -2, "__index");
     luaL_setfuncs(L, lib_int64, 0);
+    lua_setfield(L, -1, "__index");
 
     luaL_newmetatable(L, UINT64);
-    lua_pushvalue(L, -1);
-    lua_setfield(L, -1, "__index");
     luaL_setfuncs(L, lib_uint64, 0);
+    lua_setfield(L, -1, "__index");
 
     luaL_newlib(L, funcs);
 
