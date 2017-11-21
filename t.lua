@@ -119,3 +119,5 @@ print("unsigned 1 + number 1 + signed 1", int64.unsigned(1) + 1 + int64.signed(1
 print("signed(1):compare(1) ", int64.signed(1):compare(1))
 print("signed(1):compare(0) ", int64.signed(1):compare(0))
 print("signed(1):compare(2) ", int64.signed(1):compare(2))
+
+print("tonumber(signed(\"9999999999999999\")) ", int64.signed("9999999999999999"):tonumber())

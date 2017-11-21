@@ -371,6 +371,23 @@ op_len(lua_State *L)
 
 
 static int
+tonumber(lua_State *L)
+{
+    ud64_t lhs;
+
+    if (lua_gettop(L) == 0) {
+        return luaL_error(L, "one argument required");
+    }
+
+    ud64_lua_value(L, 1, &lhs);
+
+    lua_pushnumber(L, (lua_Number) UD64_GET(&lhs));
+
+    return 1;
+}
+
+
+static int
 compare(lua_State *L)
 {
     ud64_t lhs;
@@ -496,6 +513,7 @@ lib_int64[] = {
     { "__concat",
                concat_INT64 },
     { "compare", compare    },
+    { "tonumber", tonumber  },
     { NULL, NULL }
 };
 
@@ -518,6 +536,7 @@ lib_uint64[] = {
     { "__concat",
                concat_UINT64 },
     { "compare", compare     },
+    { "tonumber", tonumber   },
     { NULL, NULL }
 };
 
