@@ -110,13 +110,13 @@ ud64_lua_parse(lua_State *L, int index, ud64_t *ud)
 static const char *
 ud64_lua_set(lua_State *L, int index, ud64_t *ud)
 {
-    ud64_t *src = (ud64_t *)luaL_testudata(L, index, INT64);
+    ud64_t *src = (ud64_t *) luaL_testudata(L, index, INT64);
     if (src) {
         ud64_copy_val(ud, src);
         return INT64;
     }
 
-    src = luaL_testudata(L, index, UINT64);
+    src = (ud64_t *) luaL_testudata(L, index, UINT64);
     if (src) {
         ud64_copy_val(ud, src);
         return UINT64;
