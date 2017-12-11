@@ -121,3 +121,5 @@ print("signed(1):compare(0) ", int64.signed(1):compare(0))
 print("signed(1):compare(2) ", int64.signed(1):compare(2))
 
 print("tonumber(signed(\"9999999999999999\")) ", int64.signed("9999999999999999"):tonumber())
+
+int64.signed("0")
