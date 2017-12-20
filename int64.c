@@ -94,13 +94,13 @@ ud64_lua_parse(lua_State *L, int index, ud64_t *ud)
 
     if (ud->type == INT64) {
         ud->value.INT64  = (int64_t) strtoll(str, &endptr, 10);
-        if ((errno == ERANGE && (ud->value.INT64 == LLONG_MAX || ud->value.INT64 == LLONG_MIN))
+        if (endptr != str + len || (errno == ERANGE && (ud->value.INT64 == LLONG_MAX || ud->value.INT64 == LLONG_MIN))
                    || (errno != 0 && ud->value.INT64 == 0)) {
             return luaL_error(L, "The string (length = %d) is not an int64 string", len);
         }
     } else {
         ud->value.UINT64 = (uint64_t) strtoull(str, &endptr, 10);
-        if ((errno == ERANGE && (ud->value.UINT64 == ULLONG_MAX || ud->value.UINT64 == 0))
+        if (endptr != str + len || (errno == ERANGE && (ud->value.UINT64 == ULLONG_MAX || ud->value.UINT64 == 0))
                    || (errno != 0 && ud->value.UINT64 == 0)) {
             return luaL_error(L, "The string (length = %d) is not an uint64 string", len);
         }
