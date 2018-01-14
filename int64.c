@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <lua.h>
 #include <lauxlib.h>
 #include <math.h>
@@ -49,12 +50,10 @@ luaL_testudata(lua_State *L, int i, const char *tname)
 
 #endif
 
-
+__attribute__ ((visibility ("default")))
 const char *INT64  = "INT64";
+__attribute__ ((visibility ("default")))
 const char *UINT64 = "UINT64";
-
-
-#include "int64.h"
 
 
 struct ud64_s {
@@ -96,13 +95,13 @@ ud64_lua_parse(lua_State *L, int index, ud64_t *ud)
         ud->value.INT64  = (int64_t) strtoll(str, &endptr, 10);
         if (endptr != str + len || (errno == ERANGE && (ud->value.INT64 == LLONG_MAX || ud->value.INT64 == LLONG_MIN))
                    || (errno != 0 && ud->value.INT64 == 0)) {
-            return luaL_error(L, "The string (length = %d) is not an int64 string", len);
+            return luaL_error(L, "The string '%s' (length = %d) is not an int64 string", str, len);
         }
     } else {
         ud->value.UINT64 = (uint64_t) strtoull(str, &endptr, 10);
         if (endptr != str + len || (errno == ERANGE && (ud->value.UINT64 == ULLONG_MAX || ud->value.UINT64 == 0))
                    || (errno != 0 && ud->value.UINT64 == 0)) {
-            return luaL_error(L, "The string (length = %d) is not an uint64 string", len);
+            return luaL_error(L, "The string '%s' (length = %d) is not an uint64 string", str, len);
         }
     }
 
@@ -556,7 +555,7 @@ funcs[] = {
 
 
 int
-luaopen_int64(lua_State *L)
+open_int64(lua_State *L)
 {
     luaL_newmetatable(L, INT64);
     luaL_setfuncs(L, lib_int64, 0);
@@ -570,9 +569,6 @@ luaopen_int64(lua_State *L)
 
     return 1;
 }
-
-
-/******************** public API ********************/
 
 
 int
