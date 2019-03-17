@@ -8,47 +8,6 @@
 #include <string.h>
 #include <assert.h>
 
-#if !defined LUA_VERSION_NUM || LUA_VERSION_NUM < 502
-
-static void
-luaL_setfuncs(lua_State *l, const luaL_Reg *reg, int nup)
-{
-    int i;
-
-    luaL_checkstack(l, nup, "too many upvalues");
-    for (; reg->name != NULL; reg++) {
-        for (i = 0; i < nup; i++) {
-            lua_pushvalue(l, -nup);
-        }
-        lua_pushcclosure(l, reg->func, nup);
-        lua_setfield(l, -(nup + 2), reg->name);
-    }
-    lua_pop(l, nup);
-}
-
-static void *
-luaL_testudata(lua_State *L, int i, const char *tname)
-{
-    void *p = lua_touserdata(L, i);
-    luaL_checkstack(L, 2, "not enough stack slots");
-    if (p == NULL || !lua_getmetatable(L, i)) {
-        return NULL;
-    } else {
-        int res = 0;
-        luaL_getmetatable(L, tname);
-        res = lua_rawequal(L, -1, -2);
-        lua_pop(L, 2);
-        if (!res) {
-           p = NULL;
-        }
-    }
-    return p;
-}
-
-#define luaL_newlibtable(L,l) (lua_createtable(L,0,sizeof(l)))
-#define luaL_newlib(L,l) (luaL_newlibtable(L,l), luaL_setfuncs(L,l,0))
-
-#endif
 
 __attribute__ ((visibility ("default")))
 const char *INT64  = "INT64";
